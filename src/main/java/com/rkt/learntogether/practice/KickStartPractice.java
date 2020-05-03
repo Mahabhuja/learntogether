@@ -1,4 +1,4 @@
-package com.rkt.learntogether;
+package com.rkt.learntogether.practice;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

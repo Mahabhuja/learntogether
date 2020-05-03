@@ -1,4 +1,4 @@
-package com.rkt.learntogether;
+package com.rkt.learntogether.practice;
 
 public class Practice {
 
