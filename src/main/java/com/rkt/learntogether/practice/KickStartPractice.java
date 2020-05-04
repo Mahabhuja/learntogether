@@ -26,14 +26,10 @@ What is the maximum number of houses you can buy?
         for (int i = 1; i <= totalTests; i++) {
             totalHouses = in.nextInt();
             totalBudget = in.nextInt();
-
-
             prices = new ArrayList<>();
-
             for (int j = 0; j < totalHouses; j++) {
                 prices.add(in.nextInt());
             }
-
             Collections.sort(prices);
             totalPurchasePrice = 0;
             purchasableHouses = 0;
@@ -45,9 +41,7 @@ What is the maximum number of houses you can buy?
                     break;
                 }
             }
-
             System.out.println("case #"+i+": "+purchasableHouses);
         }
     }
-
 }
