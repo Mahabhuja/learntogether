@@ -1,0 +1,175 @@
+package com.rkt.learntogether.practice;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+
+class Solution2 {
+
+    /*
+     * Complete the 'getTransactions' function below.
+     *
+     * The function is expected to return an INTEGER.
+     * The function accepts following parameters:
+     *  1. INTEGER userId
+     *  2. INTEGER locationId
+     *  3. INTEGER netStart
+     *  4. INTEGER netEnd
+     *
+     *  https://jsonmock.hackerrank.com/api/transactions/search?userId=
+     */
+
+    public static int getTransactions(int userId, int locationId, int netStart, int netEnd) {
+        String url = "https://jsonmock.hackerrank.com/api/transactions/search?userId="+userId;
+
+        int currentPage =1, totalPage = 1;
+        Map<String, Object> response;
+        List<UserData> userData;
+        BigDecimal amount = BigDecimal.ZERO;
+
+        while(currentPage <= totalPage) {
+            response = getResponse(url+"&page="+currentPage);
+            if(totalPage == 1){
+                totalPage = (Integer) response.get("total_pages");
+            }
+            userData = (ArrayList) response.get("data");
+
+            for(UserData d : userData) {
+                if(d.locationId == locationId) {
+
+                    if(netStart<=d.ip && d.ip<=netEnd) {
+                        String amt = d.amount.replaceAll(",", "");
+                            amount = amount.add(new BigDecimal(amt));
+                    }
+                }
+            }
+
+            currentPage++;
+        }
+        amount = amount.setScale(0, BigDecimal.ROUND_HALF_EVEN);
+        return amount.intValue();
+    }
+
+
+    public static Map<String, Object> getResponse(String url) {
+
+        InputStream is = null;
+        Map<String, Object> response = new HashMap<>();
+        try{
+            is = new URL(url).openStream();
+
+
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            int copy;
+            while((copy = rd.read()) != -1){
+                sb.append((char) copy);
+            }
+            System.out.println(sb);
+            int totalPageStartIdx = sb.indexOf("total_pages");
+            int totalPageEndIdx = sb.indexOf(",",totalPageStartIdx);
+            totalPageStartIdx = totalPageStartIdx+13;
+            int totalPages = Integer.parseInt(sb.substring(totalPageStartIdx, totalPageEndIdx));
+            System.out.println("..totalPages.."+totalPages);
+            response.put("total_pages", totalPages);
+
+            String dataStr = sb.substring(sb.indexOf("[")+1, sb.indexOf("]"));
+            String[] data = dataStr.split("},\\{");
+            List<UserData> userDataList = new ArrayList<>();
+            UserData userData;
+            StringBuilder sb1;
+            String txnType = "";
+            String amount = "";
+            String ip = "";
+            int locId = -1;
+            for(String d: data){
+                System.out.println("--"+d);
+                userData = new UserData();
+                sb1 = new StringBuilder(d);
+
+                int t1 = sb1.indexOf("txnType")+10;
+                int t2 = sb1.indexOf(",",t1)-1;
+
+                userData.txnType = sb1.substring(t1,t2);
+                System.out.println("-userData.txnType->"+userData.txnType);
+
+                int a1 = sb1.indexOf("amount")+10;
+                int a2 = sb1.indexOf("\",",a1);
+
+                userData.amount = sb1.substring(a1,a2);
+                System.out.println("-userData.amount->"+userData.amount);
+
+                int i1 = sb1.indexOf("ip\":\"")+5;
+                int i2 = sb1.indexOf(".",i1);
+
+                userData.ip = Integer.parseInt(sb1.substring(i1,i2));
+                System.out.println("-userData.ip->"+userData.ip);
+
+                int l1 = sb1.indexOf("location")+16;
+                int l2 = sb1.indexOf(",",l1);
+
+                userData.locationId = Integer.parseInt(sb1.substring(l1,l2));
+                System.out.println("-userData.locationId->"+userData.locationId);
+
+                userDataList.add(userData);
+            }
+
+        response.put("data",userDataList);
+        } catch(Exception ex){
+            ex.printStackTrace();
+        }
+        finally{
+            try{
+                if(is!=null)
+                is.close();
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        return response;
+    }
+
+    static class UserData {
+        public String txnType;
+        public String amount;
+        public int ip;
+        public int locationId;
+    }
+
+
+        public static void main(String[] args) {
+            //BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+            //BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.out));
+
+            int userId = Integer.parseInt(args[0]);
+
+            int locationId = Integer.parseInt(args[1]);
+
+            int netStart = Integer.parseInt(args[2]);
+
+            int netEnd = Integer.parseInt(args[3]);
+
+            int result = Solution2.getTransactions(userId, locationId, netStart, netEnd);
+
+            System.out.println("=====>"+result);
+            //bufferedWriter.write(String.valueOf(result));
+            //bufferedWriter.newLine();
+
+            //bufferedReader.close();
+            //bufferedWriter.close();
+        }
+
+}
+
