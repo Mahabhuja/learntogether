@@ -1,12 +1,10 @@
 package com.rkt.learntogether.practice;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +31,8 @@ class Solution2 {
     public static int getTransactions(int userId, int locationId, int netStart, int netEnd) {
         String url = "https://jsonmock.hackerrank.com/api/transactions/search?userId="+userId;
 
-        int currentPage =1, totalPage = 1;
+        int currentPage =1;
+        int totalPage = 1;
         Map<String, Object> response;
         List<UserData> userData;
         BigDecimal amount = BigDecimal.ZERO;
@@ -46,12 +45,9 @@ class Solution2 {
             userData = (ArrayList) response.get("data");
 
             for(UserData d : userData) {
-                if(d.locationId == locationId) {
-
-                    if(netStart<=d.ip && d.ip<=netEnd) {
-                        String amt = d.amount.replaceAll(",", "");
-                            amount = amount.add(new BigDecimal(amt));
-                    }
+                if(d.locationId == locationId && netStart<=d.ip && d.ip<=netEnd) {
+                    String amt = d.amount.replaceAll(",", "");
+                    amount = amount.add(new BigDecimal(amt));
                 }
             }
 
@@ -98,12 +94,6 @@ class Solution2 {
                 userData = new UserData();
                 sb1 = new StringBuilder(d);
 
-                int t1 = sb1.indexOf("txnType")+10;
-                int t2 = sb1.indexOf(",",t1)-1;
-
-                userData.txnType = sb1.substring(t1,t2);
-                System.out.println("-userData.txnType->"+userData.txnType);
-
                 int a1 = sb1.indexOf("amount")+10;
                 int a2 = sb1.indexOf("\",",a1);
 
@@ -142,7 +132,6 @@ class Solution2 {
     }
 
     static class UserData {
-        public String txnType;
         public String amount;
         public int ip;
         public int locationId;
