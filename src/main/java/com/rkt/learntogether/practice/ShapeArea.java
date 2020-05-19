@@ -29,10 +29,10 @@ public class ShapeArea {
 
     }
 
-    static int getResult(int result, int n){
-        if(n > 2){
+    static int getResult(int result, int n) {
+        if(n > 2) {
             result = getResult(result, n-1) + (4*(n-2) + 4);
-        } else if(n == 2){
+        } else if(n == 2) {
             result = result + 5;
         }
         return result;
