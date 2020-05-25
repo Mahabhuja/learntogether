@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class Solution6 {
 
-    long hashMap(String[] queryType, int[][] query) {
+    static long hashMap(String[] queryType, int[][] query) {
 
         int l = queryType.length;
         String type = "";
@@ -19,8 +19,10 @@ public class Solution6 {
                     m.put(query[i][0], query[i][1]);
                     break;
                 case "addToKey" :
+                    Map<Integer, Integer> x = new HashMap<>();
                     for(Map.Entry<Integer, Integer> k : m.entrySet()){
-                        m.put(k.getKey()+query[i][0], k.getValue());
+                        x.put(k.getKey()+query[i][0], k.getValue());
+                        m = x;
                     }
                     break;
                 case "addToValue" :
@@ -36,6 +38,16 @@ public class Solution6 {
             }
         }
         return answer;
+    }
+
+    public static void main(String[] args) {
+        String[] s  = {"insert",
+                "insert",
+                "addToValue",
+                "addToKey",
+                "get"};
+        int[][] q = {{1,2},{2,3},{2}, {1}, {3}};
+        System.out.println(hashMap(s,q));
     }
 
 }
